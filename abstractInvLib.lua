@@ -1311,7 +1311,7 @@ function abstractInventory(inventories, assumeLimits, logSettings)
   function api.getItemLimit(slot)
     expect(1, slot, "number")
     local item = getGlobalSlot(slot)
-    return item.limit
+    return item.capacity
   end
 
   ---pull all items from an inventory
