@@ -209,7 +209,8 @@ end
 ---@class Item This is pulled directly from list(), or from getItemDetail(), so it may have more fields
 ---@field name string Name of this item
 ---@field nbt string|nil
----@field count number
+---@field count integer
+---@field maxCount integer?
 
 ---@class TransferOptions
 ---@field optimal boolean|nil Try to optimize item movements, true default
@@ -220,16 +221,25 @@ end
 ---@class CachedItem
 ---@field item Item|nil If an item is in this slot, this field will be an Item
 ---@field inventory string Inventory peripheral name
----@field slot number Slot in inventory this CachedItem represents
----@field globalSlot number Global slot of this CachedItem, spans across all wrapped inventories
----@field capacity number
+---@field slot integer Slot in inventory this CachedItem represents
+---@field globalSlot integer Global slot of this CachedItem, spans across all wrapped inventories
+---@field capacity integer
+
+---@class LogSettings
+---@field filename string?
+---@field cache boolean?
+---@field optimal boolean?
+---@field unoptimal boolean?
+---@field api boolean?
+---@field redirect fun(s:string)?
+---@field defrag boolean?
 
 ---@alias invPeripheral {list: function, pullItems: function, pushItems: function, getItemLimit: function, getItemDetail: function, size: function}
 
 ---Wrap inventories and create an abstractInventory
 ---@param inventories table<integer,string|invPeripheral|{name: string|invPeripheral, minSlot: integer?, maxSlot: integer?, slots: integer[]?}> Table of inventory peripheral names to wrap
 ---@param assumeLimits boolean? Default true, assume the limit of each slot is the same, saves a TON of time
----@param logSettings {filename: string, cache: boolean?, optimal: boolean, unoptimal: boolean, api: boolean, redirect: fun(s:string)}?
+---@param logSettings LogSettings?
 ---@return AbstractInventory
 function abstractInventory(inventories, assumeLimits, logSettings)
   expect(1, inventories, "table")
@@ -787,7 +797,7 @@ function abstractInventory(inventories, assumeLimits, logSettings)
       local expectedMove = math.min(amount - totalMoved, 64)
       local remainingItems = math.max(0, itemCount - expectedMove)
       item.item.count = remainingItems
-      if item.count == 0 then
+      if item.item.count == 0 then
         cacheItem(nil, item.inventory, item.slot)
       else
         cacheItem(item.item, item.inventory, item.slot)
